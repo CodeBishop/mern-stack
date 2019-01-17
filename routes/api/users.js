@@ -21,10 +21,11 @@ router.get('/test', (req, res) => res.json({msg: "users.js works!"}))
 router.post('/register', (req, res) => {
   const { errors, isValid } = validateRegisterInput(req.body)
   
-  // Check validation.
+  // Validate fields.
   if(!isValid) {
     return res.status(400).json(errors)
   }
+
   User.findOne({ email: req.body.email })
     .then(user => {
       // Reject user creation if email address already in use.
@@ -66,6 +67,13 @@ router.post('/register', (req, res) => {
 // @desc Register user
 // @access Public
 router.post('/login', (req, res) => {
+  const { errors, isValid } = validateLoginInput(req.body)
+  
+  // Validate fields.
+  if(!isValid) {
+    return res.status(400).json(errors)
+  }
+  
   const email = req.body.email
   const password = req.body.password
 
@@ -75,7 +83,8 @@ router.post('/login', (req, res) => {
     .then(user => {
       // Bail out if user was not found.
       if(!user) {
-        return res.status(404).json({email: 'User email not found'})
+        errors.email = 'User not found'
+        return res.status(404).json(errors)
       } else {
         // Check if password matches the hashed password in our database.
         bcrypt.compare(password, user.password)
@@ -92,7 +101,8 @@ router.post('/login', (req, res) => {
                 })
               })
             } else {
-              return res.status(400).json({password: 'Password incorrect'})
+              errors.password = "Password incorrect"
+              return res.status(400).json(errors)
             }
           })
       }
