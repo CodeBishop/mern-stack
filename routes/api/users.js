@@ -50,4 +50,32 @@ router.post('/register', (req, res) => {
     })
 })
 
+// @route POST /api/users/login
+// @desc Register user
+// @access Public
+router.post('/login', (req, res) => {
+  const email = req.body.email
+  const password = req.body.password
+
+  // Find the user by email.
+  // NOTE: This is a practice web app and as such it will tell the user whether their email address or password is incorrect. In the real world it is best practice to only say "username or password not correct" so that an attacker cannot build a username list.
+  User.findOne({email})
+    .then(user => {
+      // Bail out if user was not found.
+      if(!user) {
+        return res.status(404).json({email: 'User email not found'})
+      } else {
+        // Check if password matches the hashed password in our database.
+        bcrypt.compare(password, user.password)
+          .then(isMatch => {
+            if (isMatch) {
+              res.json({msg: 'Successful login'})
+            } else {
+              return res.status(400).json({password: 'Password incorrect'})
+            }
+          })
+      }
+    })
+})
+
 module.exports = router
