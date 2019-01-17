@@ -16,15 +16,18 @@ router.get('/test', (req, res) => res.json({msg: "users.js works!"}))
 router.post('/register', (req, res) => {
   User.findOne({ email: req.body.email })
     .then(user => {
+      // Reject user creation if email address already in use.
       if(user) {
         return res.status(400).json({email: 'Email already exists'})
       } else {
-        const avatar = gravatar.url(req.body,email, {
+        // Fetch an avatar image from Gravatar if the user's email is from there.
+        const avatar = gravatar.url(req.body.email, {
           s: '200', // Size (in pixels)
           r: 'pg', // Rating
           d: 'mm' // Default
         })
 
+        // Create a new user object.
         const newUser = new User({
           name: req.body.name,
           email: req.body.email,
@@ -36,13 +39,14 @@ router.post('/register', (req, res) => {
           bcrypt.hash(newUser.password, salt, (err, hash) => {
             if(err) throw err
             newUser.password = hash
+            // Save the new user object and return it as a response.
             newUser.save()
               .then(user => res.json(user))
               .catch(err => console.log(err))
           })
         })
       }
-    })
+    }).catch(err => console.log(err))
 })
 
 module.exports = router
