@@ -4,6 +4,7 @@ const express = require('express')
 const gravatar = require('gravatar')
 const jwt = require('jsonwebtoken')
 const keys = require('../../config/keys')
+const passport = require('passport')
 const router = express.Router()
 const User = require('../../models/User')
 
@@ -88,5 +89,13 @@ router.post('/login', (req, res) => {
       }
     })
 })
+
+// @route GET /api/users/current
+// @desc Return current user
+// @access Private
+router.get('/current', passport.authenticate('jwt', { session: false}), (req, res) => {
+  res.json({msg: 'Successfully found user by token id'})
+})
+
 
 module.exports = router
