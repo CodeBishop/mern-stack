@@ -5,13 +5,13 @@ const gravatar = require('gravatar')
 const router = express.Router()
 const User = require('../../models/User')
 
-// @route GET api/users/test
+// @route GET /api/users/test
 // @desc Users post route
 // @access Public
 router.get('/test', (req, res) => res.json({msg: "users.js works!"}))
 
-// @route GET api/users/test
-// @desc Users post route
+// @route POST /api/users/register
+// @desc Register user
 // @access Public
 router.post('/register', (req, res) => {
   User.findOne({ email: req.body.email })
