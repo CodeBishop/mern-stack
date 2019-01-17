@@ -94,7 +94,12 @@ router.post('/login', (req, res) => {
 // @desc Return current user
 // @access Private
 router.get('/current', passport.authenticate('jwt', { session: false}), (req, res) => {
-  res.json({msg: 'Successfully found user by token id'})
+  // Respond with a user object that does not include the password.
+  res.json({
+    id: req.user.id,
+    name: req.user.name,
+    email: req.user.email
+  })
 })
 
 
