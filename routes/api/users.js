@@ -7,6 +7,7 @@ const keys = require('../../config/keys')
 const passport = require('passport')
 const router = express.Router()
 const User = require('../../models/User')
+const validateLoginInput = require('../../validation/login')
 const validateRegisterInput = require('../../validation/register')
 
 // @route GET /api/users/test
@@ -28,7 +29,8 @@ router.post('/register', (req, res) => {
     .then(user => {
       // Reject user creation if email address already in use.
       if(user) {
-        return res.status(400).json({email: 'Email already exists'})
+        errors.email = 'Email already exists'
+        return res.status(400).json(errors)
       } else {
         // Fetch an avatar image from Gravatar if the user's email is from there.
         const avatar = gravatar.url(req.body.email, {
