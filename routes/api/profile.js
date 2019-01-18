@@ -13,6 +13,42 @@ const validateProfileInput = require('../../validation/profile')
 // @access Public
 router.get('/test', (req, res) => res.json({msg: "profile.js works!"}))
 
+// @route GET api/profile/handle/:handle
+// @desc Get profile by handle
+// @access Public
+router.get('/handle/:handle', (req, res) => {
+  const errors = {}
+
+  Profile.findOne({ handle: req.params.handle })
+    .populate('user', ['name', 'avatar'])
+    .then(profile => {
+      if(!profile) {
+        errors.noprofile = 'There is no profile for this user'
+        return res.status(400).json(errors)
+      } else {
+        res.json(profile)
+      }
+    }).catch(err => res.status(404).json(err))
+})
+
+// @route GET api/profile/user/:id
+// @desc Get profile by user ID
+// @access Public
+router.get('/user/:user_id', (req, res) => {
+  const errors = {}
+
+  Profile.findOne({ user: req.params.user_id })
+    .populate('user', ['name', 'avatar'])
+    .then(profile => {
+      if(!profile) {
+        errors.noprofile = 'There is no profile for this user'
+        return res.status(400).json(errors)
+      } else {
+        res.json(profile)
+      }
+    }).catch(err => res.status(404).json(err))
+})
+
 // @route POST api/profile
 // @desc Create or edit user profile
 // @access Private
@@ -83,7 +119,9 @@ router.post('/', passport.authenticate('jwt', {session: false}), (req, res) => {
 // @access Private
 router.get('/', passport.authenticate('jwt', {session: false}), (req, res) => {
   const errors = {}
+
   Profile.findOne({ user: req.user.id })
+    .populate('user', ['name', 'avatar'])
     .then(profile => {
       if(!profile) {
         errors.noprofile = 'There is no profile for this user'
