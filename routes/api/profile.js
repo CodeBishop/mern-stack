@@ -6,6 +6,7 @@ const passport = require('passport')
 const Profile = require('../../models/Profile')
 const router = express.Router()
 const User = require('../../models/User')
+const validateProfileInput = require('../../validation/profile')
 
 // @route GET api/profile/test
 // @desc Test profile route
@@ -16,6 +17,13 @@ router.get('/test', (req, res) => res.json({msg: "profile.js works!"}))
 // @desc Create or edit user profile
 // @access Private
 router.post('/', passport.authenticate('jwt', {session: false}), (req, res) => {
+  const {errors, isValid } = validateProfileInput(req.body)
+
+  // Check validation.
+  if(!isValid) {
+    return res.status(400).json(errors)
+  }
+  
   // Get fields
   const profileFields = {}
   profileFields.user = req.user.id
@@ -32,7 +40,7 @@ router.post('/', passport.authenticate('jwt', {session: false}), (req, res) => {
     profileFields.skills = req.body.skills.split(',')
   }
 
-  // Social
+  // Social.
   profileFields.social = {}
   if(req.body.youtube) profileFields.social.youtube = req.body.youtube
   if(req.body.twitter) profileFields.social.twitter = req.body.twitter

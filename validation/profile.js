@@ -21,8 +21,13 @@ module.exports = function validateProfileInput(data) {
     errors.skills = 'Profile skills is required'
   }
 
+  // Test that status field is valid.
+  if(Validator.isEmpty(data.status)) {
+    errors.status = 'Profile status is required'
+  }
+
   // Check that URL fields are valid.
-  ;['website', 'twitter', 'facebook', 'linkedin', 'instagram'].foreach(site => {
+  ;['website', 'twitter', 'facebook', 'linkedin', 'instagram'].forEach(site => {
     if(!isEmpty(data[site]) && !Validator.isURL(data[site])) {
       errors[site] = 'Not a valid URL'
     }
